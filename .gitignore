@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.Python
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Data files - Ignore all CSV EXCEPT samples and results
+*.csv
+# But keep these specific files
+!*_Sample.csv
+!*_Expiries.csv
+!results.csv
+
+# Ignore large data files (not samples)
+data/Nifty/NIFTY_Options.csv
+data/Nifty/NIFTY_Spot.csv
+data/Nifty/Smaller Files/
+data/Sensex/SENSEX_Options.csv
+data/Sensex/SENSEX_Spot.csv
+
+# Generated outputs
+# Keep logs, PDFs, PNGs, results.csv
+# Only ignore temp PNG files
+temp_*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+venv/
+env/
+ENV/
