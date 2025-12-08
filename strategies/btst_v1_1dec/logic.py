@@ -3,6 +3,7 @@ This will will caputre all the strategy specific functions which we will be usin
 """
 
 ##Importing the relevant libraries/packages
+from datetime import datetime
 import pandas as pd
 import re ##regex
 import os
@@ -275,6 +276,7 @@ Signature:
 
         onitial_capital (Float): The initial capital with which we started the trading
         rpt (float): represents % of initial capital which we will risk per day (Acronym for risk per trade)
+        file_path ("String") : represents the directory in which we want to store the output 
     Outputs:
         df_results (Pandas DF): Transformed input DF, with the following fields:
             date (Python date): of the form datetime.date(2022, 1, 3)
@@ -282,15 +284,18 @@ Signature:
             execution_pnl (Float) - representing gross PnL minus the slippage, pre txn charges
             net_pnl (Float) - representing net PnL , net of slippage, net of txn charges
         results.csv(CSV file) - in the same folder in which we are running the code
+
 Purpose: To transform input pandas df by adding the actual pnl bassed on the initial capittal and defined rpt , we will also drop _pct columns to keep things simple and readable 
 """
 
-def results_final(df_results, initial_capital, rpt):
+def results_final(df_results, initial_capital, rpt, file_path):
     ##Fairly easy just adding some new columns and dropping original columns
     risk_per_trade = rpt*initial_capital
     df_results["gross_pnl"] = df_results["gross_pct"]*risk_per_trade
     df_results["execution_pnl"] = df_results["execution_pct"]*risk_per_trade
     df_results["net_pnl"] = df_results["net_pct"]*risk_per_trade
     df_results.drop(columns = ["gross_pct", "execution_pct", "net_pct"], inplace = True)    
-    df_results.to_csv("results.csv", index=False, header=True, sep=",", encoding='utf-8' )
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_file = os.path.join(file_path, f"results_{timestamp}.csv")
+    df_results.to_csv(output_file, index=False, header=True, sep=",", encoding='utf-8' )
     return df_results

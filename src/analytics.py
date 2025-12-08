@@ -14,6 +14,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from pathlib import Path
 
 ##Setting up the logger
 import logging
@@ -524,6 +525,8 @@ class Metrics():
             gross (Boolean) - whether we want to map gross_equity_curve (default to be false)
             execution (Boolean) - whether we want to map execution_equity_curve (default to be false)
             net (Boolean) - whether we want to map net_equity_curve (default to be false)
+            file_path (String) - should be the path (relative or absolute) at which the png file should be stored (this will be clubbed with filename)
+                file_path will be defaulted to None (and will be updated to current directory), and will be clubbed with filename using os.path.join(file_path, filename) for OS  independent ops
             filename (Stirng) - optional argument with default valye as equity_curve.png , will be useful for code reusability
         Outputs:
             Plot of equity curve vs time (PNG) - saved directly in the same folder in which we are using the function
@@ -533,7 +536,7 @@ class Metrics():
     Purpose:
         Generate the equity curve based on initial capital and returns form start date till end date, and save as PnG in the same folder, also returns the filename which was created
     """
-    def generate_equity_curve(self, gross=False, execution=False, net=False, filename="equity_curve.png"):
+    def generate_equity_curve(self, gross=False, execution=False, net=False, file_path = None, filename="equity_curve.png"):
         """
         Generate equity curve plot with CAGR in legend
         """
@@ -563,8 +566,10 @@ class Metrics():
         plt.legend(fontsize=11, loc='best')
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        if file_path == None:
+            file_path = os.getcwd()
+        file_path = os.path.join(file_path, filename)
+        plt.savefig(file_path, dpi=300, bbox_inches='tight')
         plt.close()
         logger.info(f"Saved equity curve: {filename}")
         return filename  # ADDED
@@ -577,6 +582,8 @@ class Metrics():
             gross (Boolean) - whether we want to map gross_dd_curve (default to be false)
             execution (Boolean) - whether we want to map execution_dd_curve (default to be false)
             net (Boolean) - whether we want to map net_dd_curve (default to be false)
+            file_path (String) - should be the path (relative or absolute) at which the png file should be stored (this will be clubbed with filename)
+                file_path will be defaulted to None (and will be updated to current directory), and will be clubbed with filename using os.path.join(file_path, filename) for OS  independent ops
             filename (Stirng) - optional argument with default valye as drawdown_curve.png , will be useful for code reusability
         Outputs:
             Plot of DD curve vs time (PNG) - saved directly in the same folder in which we are using the function
@@ -586,7 +593,7 @@ class Metrics():
     Purpose:
         Generate the DD curve based on initial capital and DD from start date till end date, and save as PnG in the same folder, also returns the file name which was generated
     """
-    def generate_dd_curve(self, gross=False, execution=False, net=False, filename="drawdown_curve.png"):
+    def generate_dd_curve(self, gross=False, execution=False, net=False, file_path = None, filename="drawdown_curve.png"):
         """
         Generate drawdown curve plot with max DD in legend
         """
@@ -623,8 +630,10 @@ class Metrics():
         plt.legend(fontsize=11, loc='best')
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        if file_path == None:
+            file_path = os.getcwd()
+        file_path = os.path.join(file_path, filename)
+        plt.savefig(file_path, dpi=300, bbox_inches='tight')
         plt.close()
         logger.info(f"Saved drawdown curve: {filename}")
         return filename  # ADDED
@@ -637,6 +646,8 @@ class Metrics():
             gross (Boolean) - whether we want to map both gross dd and equity curve together (default to be false)
             execution (Boolean) - whether we want to map both execution dd and equity curve together  (default to be false)
             net (Boolean) - whether we want to map both net dd and equity curve together (default to be false)
+            file_path (String) - should be the path (relative or absolute) at which the png file should be stored (this will be clubbed with filename)
+                file_path will be defaulted to None (and will be updated to current directory), and will be clubbed with filename using os.path.join(file_path, filename) for OS  independent ops
             filename (Stirng) - optional argument with default valye as equity_dd_combined.png , will be useful for code reusability
         Outputs:
             Plot of DD + Equity curve vs time (PNG) - saved directly in the same folder in which we are using the function
@@ -647,7 +658,7 @@ class Metrics():
         Generate the DD curve based on initial capital and DD from start date till end date, and save as PnG in the same folder, also returns the file name of the png file which was generated
 
     """
-    def combine_equity_dd_curve(self, gross=False, execution=False, net=False, filename="equity_dd_combined.png"):
+    def combine_equity_dd_curve(self, gross=False, execution=False, net=False, file_path = None, filename="equity_dd_combined.png"):
         """
         Generate combined equity + drawdown plot (2 panels aligned)
         """
@@ -708,8 +719,10 @@ class Metrics():
         ax2.grid(True, alpha=0.3)
         
         plt.tight_layout()
-        
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        if file_path == None:
+            file_path = os.getcwd()
+        file_path = os.path.join(file_path, filename)
+        plt.savefig(file_path, dpi=300, bbox_inches='tight')
         plt.close()
         logger.info(f"Saved combined chart: {filename}")
         return filename
@@ -719,10 +732,12 @@ class Metrics():
     Signature:
         Inputs:
             self
-            return_type (String): Should be one of "gross", "execution", "net" - will be used to generate the pnl accoordingly
-            filename (String) : Name of the pdf file which needs to be generated
             strategy (String): NAmme of the strategy for which we are building the report
+            return_type (String): Should be one of "gross", "execution", "net" - will be used to generate the pnl accoordingly
             logic (String) : Optional argument , will default to "Confidential", else will print what the user passed in
+            file_path (String) - should be the path (relative or absolute) at which the png file should be stored (this will be clubbed with filename)
+                file_path will be defaulted to None (and will be updated to current directory), and will be clubbed with filename using os.path.join(file_path, filename) for OS  independent ops
+            filename (String) : Name of the pdf file which needs to be generated
         Outputs:
             A pdf named <filename>.pdf which will have the following details
                 equity_dd_combined.png curve for return_type selected
@@ -731,20 +746,32 @@ class Metrics():
     Purpose: To generate a new pdf file named <filename>.pdf in the same folder as teh code is running and generate a full bt report
         If a file already exits with the name, it will be overwritten
     """
-    def generate_report(self, strategy, return_type="execution", logic="Confidential", filename="report.pdf"):
+    def generate_report(self, strategy, return_type="execution", logic="Confidential", file_path=None, filename="report.pdf"):
 
         # Validate return_type
         if return_type not in ["gross", "execution", "net"]:
             logger.error(f"Invalid return_type: {return_type}")
             raise ValueError("return_type must be 'gross', 'execution', or 'net'")
         
-        # Create PDF
+        # Handle file paths properly
+        if file_path is None:
+            file_path = os.getcwd()  # Current directory
+        
+        # Ensure .pdf extension
         if not filename.endswith('.pdf'):
             filename = filename + '.pdf'
         
-        doc = SimpleDocTemplate(filename, pagesize=letter,
+        # Create full paths using os.path.join (cross-platform)
+        pdf_path = os.path.join(file_path, filename)
+        chart_filename = os.path.join(file_path, f"temp_{return_type}_equity_dd.png")
+        
+        # Ensure directory exists
+        os.makedirs(file_path, exist_ok=True)
+        
+        # Create PDF document
+        doc = SimpleDocTemplate(pdf_path, pagesize=letter,
                                 rightMargin=0.4*inch, leftMargin=0.4*inch,
-                                topMargin=0.3*inch, bottomMargin=0.3*inch)  # Reduced margins
+                                topMargin=0.3*inch, bottomMargin=0.3*inch)
         
         # Container for elements
         elements = []
@@ -754,25 +781,25 @@ class Metrics():
         title_style = ParagraphStyle(
             'CompactTitle',
             parent=styles['Heading1'],
-            fontSize=16,  # Reduced from 18
+            fontSize=16,
             textColor=colors.HexColor('#2C3E50'),
-            spaceAfter=4,  # Reduced from 6
+            spaceAfter=4,
             alignment=TA_CENTER
         )
         
         heading_style = ParagraphStyle(
             'CompactHeading',
             parent=styles['Heading2'],
-            fontSize=10,  # Reduced from 11
+            fontSize=10,
             textColor=colors.HexColor('#34495E'),
-            spaceAfter=3,  # Reduced from 4
-            spaceBefore=4  # Reduced from 6
+            spaceAfter=3,
+            spaceBefore=4
         )
         
         # ========== HEADER ==========
         elements.append(Paragraph(f"<b>Backtest Report: {strategy}</b>", title_style))
         
-        # METADATA - COMPACT VERTICAL LIST
+        # METADATA
         metadata = [
             ["Return Type:", return_type.capitalize()],
             ["Initial Capital:", f"${self.initial_capital:,.0f}"],
@@ -784,19 +811,16 @@ class Metrics():
         
         metadata_table = Table(metadata, colWidths=[1.1*inch, 5.1*inch])
         metadata_table.setStyle(TableStyle([
-            ('FONTSIZE', (0, 0), (-1, -1), 8),  # Reduced from 9
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
             ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),  # Reduced from 2
-            ('TOPPADDING', (0, 0), (-1, -1), 1),  # Reduced from 2
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+            ('TOPPADDING', (0, 0), (-1, -1), 1),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]))
         elements.append(metadata_table)
-        elements.append(Spacer(1, 0.1*inch))  # Reduced from 0.15
+        elements.append(Spacer(1, 0.1*inch))
         
-        # ========== MAIN CONTENT: CHART + METRICS SIDE BY SIDE ==========
-        
-        # Generate compact chart
-        chart_filename = f"temp_{return_type}_equity_dd.png"
+        # ========== GENERATE CHART (saved to same directory as PDF) ==========
         if return_type == "gross":
             self.combine_equity_dd_curve(gross=True, filename=chart_filename)
         elif return_type == "execution":
@@ -850,7 +874,7 @@ class Metrics():
         ]
         
         # Create 3 metric tables
-        col_w = 0.95*inch  # Slightly reduced
+        col_w = 0.95*inch
         returns_table = Table(returns_data, colWidths=[col_w, col_w])
         risk_table = Table(risk_data, colWidths=[col_w, col_w])
         winloss_table = Table(winloss_data, colWidths=[col_w, col_w])
@@ -862,9 +886,9 @@ class Metrics():
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 7),  # Reduced from 8
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),  # Reduced from 3
-            ('TOPPADDING', (0, 0), (-1, -1), 2),  # Reduced from 3
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
         ])
@@ -873,10 +897,10 @@ class Metrics():
         risk_table.setStyle(metric_style)
         winloss_table.setStyle(metric_style)
         
-        # Arrange chart and metrics side by side - REDUCED CHART HEIGHT
-        img = Image(chart_filename, width=4.2*inch, height=2.5*inch)  # Reduced from 3.0
+        # Arrange chart and metrics side by side
+        img = Image(chart_filename, width=4.2*inch, height=2.5*inch)
         
-        # Put metrics in a single container table (3 tables stacked vertically)
+        # Put metrics in a single container table
         metrics_container = Table([[returns_table], [risk_table], [winloss_table]])
         metrics_container.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
@@ -884,15 +908,15 @@ class Metrics():
             ('RIGHTPADDING', (0, 0), (-1, -1), 0),
         ]))
         
-        # Main layout: chart on left, metrics on right
+        # Main layout
         main_layout = Table([[img, metrics_container]], colWidths=[4.3*inch, 2.1*inch])
         main_layout.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 3),  # Reduced from 5
-            ('RIGHTPADDING', (0, 0), (-1, -1), 3),  # Reduced from 5
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
         ]))
         elements.append(main_layout)
-        elements.append(Spacer(1, 0.08*inch))  # Reduced from 0.1
+        elements.append(Spacer(1, 0.08*inch))
         
         # ========== MONTHLY RETURNS TABLE ==========
         elements.append(Paragraph("<b>Monthly Returns (%)</b>", heading_style))
@@ -926,15 +950,15 @@ class Metrics():
         
         monthly_table = Table(monthly_data, colWidths=[col_width] * num_cols)
         
-        # Style with conditional colors - REDUCED FONT SIZE
+        # Style with conditional colors
         table_style = [
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495E')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 6),  # Reduced from 7
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),  # Reduced from 3
-            ('TOPPADDING', (0, 0), (-1, -1), 2),  # Reduced from 3
+            ('FONTSIZE', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
         ]
         
@@ -971,5 +995,5 @@ class Metrics():
         if os.path.exists(chart_filename):
             os.remove(chart_filename)
         
-        logger.info(f"Report generated: {filename}")
-        return filename
+        logger.info(f"Report generated: {pdf_path}")
+        return pdf_path  # Return full path

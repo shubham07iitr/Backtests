@@ -11,6 +11,7 @@ A Python-based backtesting framework for options trading strategies with compreh
 - Monthly returns heatmap with color-coded performance
 - Professional PDF reports with charts and metrics
 - Support for gross, execution, and net returns
+- Cross-platform support (Windows/Mac/Linux) 
 
 ## Requirements
 
@@ -31,17 +32,18 @@ pip install -r requirements.txt
 
 ### Running a Backtest
 
-Navigate to a specific backtest folder and run:
+Navigate to a specific strategy folder and run:  
 ```bash
-cd runs/btst_v1_1dec
+cd strategies/btst_v1_1dec  ← CHANGED (was "runs/btst_v1_1dec")
 python3 main.py
 ```
 
 This will:
 - Execute the backtest using the strategy defined in `logic.py`
 - Use parameters from `config.py`
-- Generate `results.csv` with daily PnL
-- Create a PDF report with metrics and charts
+- Save results to `results/btst_v1_1dec/results_<timestamp>.csv`  
+- Create a PDF report in `results/btst_v1_1dec/`  
+- Generate logs in `logs/btst_v1_1dec/`  
 
 ### Analyzing Results
 ```python
@@ -49,17 +51,18 @@ from src.analytics import Metrics
 import pandas as pd
 
 # Load backtest results
-df_results = pd.read_csv('runs/btst_v1_1dec/results.csv')
+df_results = pd.read_csv('results/btst_v1_1dec/results_20251208_190238.csv')
 
 # Create metrics object
 metrics = Metrics(df_results, initial_capital=100000)
 
 # Generate custom report
 metrics.generate_report(
-    strategy="BTST_V1_1DEC",
-    return_type="execution",  # or "gross", "net"
-    logic="Buy ATM CE when evening spot > morning spot",
-    filename="custom_report.pdf"
+strategy="BTST_V1_1DEC",
+return_type="execution",  # or "gross", "net"
+logic="Buy ATM CE when evening spot > morning spot",
+file_path="results/btst_v1_1dec",
+filename="custom_report.pdf"
 )
 
 # Access individual metrics
@@ -70,37 +73,46 @@ sharpe = metrics.sharpe_ratio()
 
 ### Creating a New Backtest
 
-1. Copy an existing backtest folder
+1. Copy an existing strategy folder: `cp -r strategies/btst_v1_1dec strategies/my_strategy` 
 2. Modify `config.py` with your parameters
-3. Update `logic.py` with your strategy
+3. Update `logic.py` with your strategy logic  
 4. Run `python3 main.py`
 
 
 ## Project Structure
 ```
 Backtests/
+├── config/                     ← NEW (entire folder)
+│   ├── __init__.py
+│   └── settings.py             # Framework-level settings
 ├── data/
 │   ├── Nifty/
 │   │   ├── Smaller Files/
-│   │   ├── NIFTY_Expiries.csv # File with all NIFTY expiries since 2022
+│   │   ├── NIFTY_Expiries.csv
 │   │   ├── NIFTY_Options.csv
 │   │   └── NIFTY_Spot.csv
 │   └── Sensex/
 │       ├── SENSEX_Options.csv
 │       └── SENSEX_Spot.csv
-├── runs/
-│   └── btst_v1_1dec/          # Example backtest run
-│       ├── config.py           # Strategy configuration
-│       ├── logic.py            # Strategy logic
-│       ├── main.py             # Execution script
-│       ├── results.csv         # Backtest results
-│       ├── report.pdf          # Generated PDF report
-│       └── scratch1.ipynb      # Analysis notebook
+├── logs/                       ← NEW (entire folder - moved from strategy)
+│   └── btst_v1_1dec/
+├── results/                    ← NEW (entire folder - moved from strategy)
+│   └── btst_v1_1dec/
+│       ├── results_*.csv
+│       └── *.pdf
 ├── src/
 │   ├── __init__.py
 │   ├── analytics.py            # Metrics and reporting
 │   ├── data_operations.py      # Data loading and processing
 │   └── execution.py            # Trade execution logic
+├── strategies/                 ← CHANGED (was "runs/")
+│   └── btst_v1_1dec/           # Example strategy
+│       ├── config.py           # Strategy configuration
+│       ├── logic.py            # Strategy logic
+│       ├── main.py             # Execution script
+│       ├── readme.md
+│       └── scratch1.ipynb      # Analysis notebook
+├── .gitignore
 ├── readme.md
 └── requirements.txt
 ```

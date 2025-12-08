@@ -32,13 +32,12 @@ logging.basicConfig(
     datefmt='%H:%M:%S',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(f'{config.LOG_DIR}/run_{timestamp}.log')  # Use from config
+        logging.FileHandler(os.path.join(config.LOG_DIR, f'run_{timestamp}.log'))  # Use from config
     ]
 )
 logger = logging.getLogger(__name__)
 
-
-
+#--------------------------------------------------------------DEFINING MAIN FUNCTION NOW-----------------------------------------------------------------------------------#
 def main():
     ##Starting our logic with a log
     logger.info(f"Starting: {config.STRATEGY_NAME}")
@@ -56,7 +55,7 @@ def main():
     logger.info(f"Loading {len(csv_files)} CSV files...")
     list_df = [] ##List of dataframes which will load all the smaller files on to it
     for i in csv_files:
-        list_df.append(pd.read_csv(config.PATH_SMALLER_FILES+"/"+i))
+        list_df.append(pd.read_csv(os.path.join(config.PATH_SMALLER_FILES, i)))
     ##Step 5 - For the sake of efficiency , we will drop any row which is not 916 or 320
     list_df_drop_timestamps = [] ##Creating a new list of df which will store the list of df in which we have dropped all rows except that of 916 and 320
     for i in list_df:
@@ -89,11 +88,11 @@ def main():
     ##Step 10 - Let;s now transform our dictionary into a dataframe with pct values
     df_results = logic.results_df(dict_final) ##in this df_results we store data in pct form
     ##Step 11 - Now let's transform our dataframe from previous step to host absolute pnl values based on risk per trade and initial capital
-    df_results = logic.results_final(df_results, config.INITIAL_CAPITAL, config.RPT)
+    df_results = logic.results_final(df_results, config.INITIAL_CAPITAL, config.RPT,config.RESULTS_FINAL_PATH)
     ##Step 12 - Finally let's use the analytics library to generate our finished pdf
     logger.info("Generating report...")
     metrics = Metrics(df_results, config.INITIAL_CAPITAL)
-    metrics.generate_report( strategy = config.STRATEGY_NAME, logic = config.LOGIC, return_type = config.RETURN_TYPE, filename= config.REPORT_NAME )
+    metrics.generate_report( strategy = config.STRATEGY_NAME, logic = config.LOGIC, return_type = config.RETURN_TYPE, file_path = config.RESULTS_FINAL_PATH, filename= config.REPORT_NAME )
     logger.info(f"Done! Report: {config.REPORT_NAME}")
     return
 
